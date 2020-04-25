@@ -16,6 +16,9 @@ import youtube_dl
 #     meta=ydl.extract_info('https://www.youtube.com/watch?v=6BuJMvpAaDA',download=True)
 #
 # pprint(meta)
+def chek(info):
+    pprint(info)
+
 
 class Downloader:
     ydl_opts = {
@@ -27,13 +30,14 @@ class Downloader:
         }],
     }
     def __init__(self):
-        self.name_file='LVNX - это ли счастье-wcdGhYMpzKM'
+        self.name_file=None
 
 
     def run(self,url,param=None):
         info=self._get_and_download(url)
         self.name_file=info['title']+'-'+info['id']
         print(self.name_file)
+        # chek(info)
 
 
     def _get_and_download(self, url):
@@ -43,6 +47,7 @@ class Downloader:
 
     def del_file(self):
         self.name_file=self.name_file+'.mp3'
+        path=os.path.join(os.getcwd(),self.name_file)
         os.remove(self.name_file)
 
 
