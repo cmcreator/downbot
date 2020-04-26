@@ -1,10 +1,12 @@
 import os
 import re
 from pprint import pprint
-
 import youtube_dl
+import logging.config
+from logconfig import dictLogConfig
 
-
+logging.config.dictConfig(dictLogConfig)
+logger = logging.getLogger("Youtube")
 class Downloader:
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -14,22 +16,28 @@ class Downloader:
             'preferredquality': '192',
 
         }],
-        'outtmpl': '%(title)s-%(id)s.%(ext)s',
+        'outtmpl': '\music\%(title)s-%(id)s.%(ext)s',
+        'noplaylist': True,
     }
 
     def __init__(self):
         self.name_file = None
 
-    def run(self, url, param=None):
-        info = self._get_and_download(url)
-        self.name_file = info['title'] + '-' + info['id'] + '.mp3'
-        self.refacor()
+    def run(self, url):
+        logger.info('Начинает работу')
+        try:
+            info = self._get_and_download(url)
+        except Exception as exc:
+            logger.exception(f'Неудалось скачать {url}')
+        self.get_name(info=info)
 
 
-    def refacor(self):
+    def get_name(self,info):
         '''
+                        Имя файла
                         Убираем ? символ из .mp3
         '''
+        self.name_file = info['title'] + '-' + info['id'] + '.mp3'
         reg = re.compile('[?]')
         self.name_file=reg.sub('', self.name_file)
 
@@ -39,16 +47,19 @@ class Downloader:
         '''
                 Скачивание .mp3 и получение метаданных
         '''
+        logger.info('Скачивание mp3')
         with youtube_dl.YoutubeDL(Downloader.ydl_opts) as ydl:
             meta = ydl.extract_info(url, download=True)
+        logger.info('Скачало mp3 '+meta['id'])
         return meta
 
     def del_file(self):
         '''
         Удаление .mp3
         '''
-        path = os.path.join(os.getcwd(), self.name_file)
-        os.remove(self.name_file)
+        logger.info(f'Удаляем {self.name_file}')
+        path = os.path.join(os.getcwd(),'music',self.name_file)
+        os.remove(path)
 
 
 video_url = Downloader()

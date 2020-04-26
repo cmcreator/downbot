@@ -137,4 +137,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug
 gabage.py
-.mp3
+
+#addition
+music
+logs
